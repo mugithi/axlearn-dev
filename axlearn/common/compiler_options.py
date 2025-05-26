@@ -3,6 +3,7 @@
 
 # This module must not depend on any jax/axlearn modules so that
 # importing this module does not result in initializing jax.
+import os
 import re
 import typing
 from typing import Any, Dict, Sequence, Union
@@ -43,6 +44,24 @@ def default_xla_options(
         xla_tpu_perform_spmd_cse_prevention="false",
         # b/229655601: prevent OOM on gpt2-small-repeat.
     )
+
+    # Check for LIBTPU_LOGS and add megascale debug flags if applicable.
+    libtpu_logs_path = os.environ.get("LIBTPU_LOGS")
+    if libtpu_logs_path and libtpu_logs_path.startswith("gs://"):
+        logging.info(
+            "LIBTPU_LOGS is set to a gs:// path: %s. Adding megascale debug flags.",
+            libtpu_logs_path,
+        )
+        options.update(
+            megascale_rapideye_error_digest_log_path=libtpu_logs_path,
+            megascale_debug_port=8081,
+        )
+    else:
+        logging.info(
+            "LIBTPU_LOGS ('%s') is not set or not a gs:// path. Not adding megascale debug flags.",
+            libtpu_logs_path,
+        )
+
     if version == "v4":
         options.update(
             # Per maggioni@google.com, the following flags are not supported by V3.

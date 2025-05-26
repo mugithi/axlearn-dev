@@ -4,10 +4,10 @@ export USER="isaack"
 # Set environment variables
 export CLUSTER=${CLUSTER:-$USER-axlearn}
 export PROJECT_ID=$(gcloud config get project)
-export OUTPUT_DIR=gs://$PROJECT_ID-axlearn/$USER-v6e-7b-1/$RUN
+export TRAINER_DIR=gs://$PROJECT_ID-axlearn/$USER-v6e-7b-1/$RUN
 export BASTION_TIER=disabled
-export LIBTPU=$OUTPUT_DIR/libtpu_logs/
-export LIBTPU_INIT_ARGS="--megascale_rapideye_error_digest_log_path=${LIBTPU} --megascale_debug_port=8081"
+export LIBTPU_LOGS=$TRAINER_DIR/libtpu_logs/
+# export LIBTPU_INIT_ARGS="--megascale_rapideye_error_digest_log_path=${LIBTPU_LOGS} --megascale_debug_port=8081"
 
 # export UPLOAD_INTERVAL=5
 # Ensure USER is set for the job name (e.g., isaack)
@@ -35,7 +35,7 @@ axlearn gcp launch run --cluster=$CLUSTER \
         --bundler_spec=dockerfile=Dockerfile --bundler_spec=target=tpu \
         -- python3 -m axlearn.common.launch_trainer_main \
         --module=text.gpt.c4_trainer --config=fuji-7B-v2-flash \
-          --trainer_dir=$OUTPUT_DIR \
+          --trainer_dir=$TRAINER_DIR \
           --data_dir=gs://axlearn-public/tensorflow_datasets \
           --jax_backend=tpu \
           --mesh_selector=tpu-v6e-16 \
