@@ -90,6 +90,10 @@ ENV PIP_FIND_LINKS=https://storage.googleapis.com/jax-releases/libtpu_releases.h
 # Ensure we install the TPU version, even if building locally.
 # Jax will fallback to CPU when run on a machine without TPU.
 RUN pip install .[core,tpu]
+
+# Now, explicitly install your pinned version of libtpu from your specified index.
+# This should overwrite any libtpu installed by the previous step if different.
+RUN pip install libtpu==0.0.11.2 --extra-index-url https://storage.googleapis.com/libtpu-wheels/
 RUN if [ -n "$EXTRAS" ]; then pip install .[$EXTRAS]; fi
 COPY . .
 
