@@ -5,6 +5,7 @@
 # importing this module does not result in initializing jax.
 import os
 import re
+import sys # <-- Add import sys
 import typing
 from typing import Any, Dict, Sequence, Union
 
@@ -170,10 +171,18 @@ def default_xla_options(
     # Validate options. Will never fail if this function is implemented correctly.
     for k, v in options.items():
         try:
-            int(v)
+            # Attempt to convert to int. If it works, it's a valid int or int-like string.
+            # Note: megascale_debug_port (e.g., 8081) will pass this.
+            int(str(v)) # Convert to str first in case v is already an int.
             continue
         except ValueError:
-            assert v in [True, False, "true", "false", "megachip_tccontrol", "10m"], (k, v)
+            # If not int-convertible, check if it's a boolean or an accepted string keyword.
+            # Path strings like for megascale_rapideye_error_digest_log_path are also strings.
+            if isinstance(v, (str, bool)) or v in ["true", "false", "megachip_tccontrol", "10m"]:
+                # Allow any string (like our gs:// path or "true"/"false") or actual booleans.
+                continue
+            # If it's none of the above, then it's an unexpected type/value.
+            assert False, f"Unexpected XLA option value for key '{k}': {v} (type: {type(v)})"
 
     return options
 
