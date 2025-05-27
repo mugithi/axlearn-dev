@@ -55,6 +55,8 @@ def default_xla_options(
         options.update(
             megascale_rapideye_error_digest_log_path=libtpu_logs_path,
             megascale_debug_port=8081,
+            megascale_graph_executor_include_telemetry_in_state_summary="false",
+
         )
     else:
         print(f"DEBUG_COMPILER_OPTIONS.PY: LIBTPU_LOGS ('{libtpu_logs_path}') is not set or not a gs:// path. Not adding megascale flags.", file=sys.stderr)
