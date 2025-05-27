@@ -25,7 +25,7 @@ export LIBTPU_LOGS=$TRAINER_DIR/libtpu_logs/
 ### Will run  the job on the specified cluster using the previously built image.
 
 
-axlearn gcp launch start --cluster=$CLUSTER \
+axlearn gcp launch run --cluster=$CLUSTER \
         --runner_name gke_tpu_single \
         --name=$USER \
         --instance_type=tpu-v6e-16 \
@@ -33,7 +33,7 @@ axlearn gcp launch start --cluster=$CLUSTER \
         --bundler_spec=allow_dirty=True \
         --bundler_type=artifactregistry --bundler_spec=image=tpu \
         --bundler_spec=dockerfile=Dockerfile --bundler_spec=target=tpu \
-        -- python3 -m axlearn.common.launch_trainer_main \
+        -- env LIBTPU_LOGS="$LIBTPU_LOGS" python3 -m axlearn.common.launch_trainer_main \
         --module=text.gpt.c4_trainer --config=fuji-7B-v2-flash \
           --trainer_dir=$TRAINER_DIR \
           --data_dir=gs://axlearn-public/tensorflow_datasets \
