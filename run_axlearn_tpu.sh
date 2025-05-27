@@ -4,7 +4,7 @@ export USER="isaack"
 # Set environment variables
 export CLUSTER=${CLUSTER:-$USER-axlearn}
 export PROJECT_ID=$(gcloud config get project)
-export TRAINER_DIR=gs://$PROJECT_ID-axlearn/$USER-v6e-7b-1/$RUN
+export TRAINER_DIR=gs://$PROJECT_ID-axlearn-$USER/$RUN
 export BASTION_TIER=disabled
 export LIBTPU_LOGS=$TRAINER_DIR/libtpu_logs/
 # export LIBTPU_INIT_ARGS="--megascale_rapideye_error_digest_log_path=${LIBTPU_LOGS} --megascale_debug_port=8081"
@@ -25,7 +25,7 @@ export LIBTPU_LOGS=$TRAINER_DIR/libtpu_logs/
 ### Will run  the job on the specified cluster using the previously built image.
 
 
-axlearn gcp launch run --cluster=$CLUSTER \
+axlearn gcp launch start --cluster=$CLUSTER \
         --runner_name gke_tpu_single \
         --name=$USER \
         --instance_type=tpu-v6e-16 \

@@ -47,6 +47,8 @@ def default_xla_options(
 
     # Check for LIBTPU_LOGS and add megascale debug flags if applicable.
     libtpu_logs_path = os.environ.get("LIBTPU_LOGS")
+    # Temporary debug print:
+    logging.info("DEBUG: LIBTPU_LOGS in default_xla_options: %s", libtpu_logs_path)
     if libtpu_logs_path and libtpu_logs_path.startswith("gs://"):
         logging.info(
             "LIBTPU_LOGS is set to a gs:// path: %s. Adding megascale debug flags.",
