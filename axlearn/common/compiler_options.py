@@ -47,22 +47,16 @@ def default_xla_options(
 
     # Check for LIBTPU_LOGS and add megascale debug flags if applicable.
     libtpu_logs_path = os.environ.get("LIBTPU_LOGS")
-    # Temporary debug print:
-    logging.info("DEBUG: LIBTPU_LOGS in default_xla_options: %s", libtpu_logs_path)
+    # More forceful temporary debug print:
+    print(f"DEBUG_COMPILER_OPTIONS.PY: LIBTPU_LOGS in default_xla_options: {libtpu_logs_path}", file=sys.stderr)
     if libtpu_logs_path and libtpu_logs_path.startswith("gs://"):
-        logging.info(
-            "LIBTPU_LOGS is set to a gs:// path: %s. Adding megascale debug flags.",
-            libtpu_logs_path,
-        )
+        print(f"DEBUG_COMPILER_OPTIONS.PY: LIBTPU_LOGS is gs:// path '{libtpu_logs_path}'. Adding megascale flags.", file=sys.stderr)
         options.update(
             megascale_rapideye_error_digest_log_path=libtpu_logs_path,
             megascale_debug_port=8081,
         )
     else:
-        logging.info(
-            "LIBTPU_LOGS ('%s') is not set or not a gs:// path. Not adding megascale debug flags.",
-            libtpu_logs_path,
-        )
+        print(f"DEBUG_COMPILER_OPTIONS.PY: LIBTPU_LOGS ('{libtpu_logs_path}') is not set or not a gs:// path. Not adding megascale flags.", file=sys.stderr)
 
     if version == "v4":
         options.update(

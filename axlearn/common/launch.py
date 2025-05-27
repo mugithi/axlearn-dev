@@ -12,6 +12,8 @@ from axlearn.common import compiler_options
 
 # pylint: disable=wrong-import-position,wrong-import-order
 
+# Early debug print for LIBTPU_LOGS
+print(f"DEBUG_LAUNCH.PY: LIBTPU_LOGS in launch.py top level: {os.environ.get('LIBTPU_LOGS')}", file=sys.stderr)
 
 instance_type = os.environ.get("TPU_TYPE", "none")
 num_tpu_slices = int(os.environ.get("NUM_TPU_SLICES", 1))
