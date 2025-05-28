@@ -4,11 +4,10 @@ export USER="isaack"
 # Set environment variables
 export CLUSTER=${CLUSTER:-$USER-axlearn}
 export PROJECT_ID=$(gcloud config get project)
-export TRAINER_DIR=gs://$PROJECT_ID-axlearn-$USER/
+export TRAINER_DIR=gs://$PROJECT_ID-axlearn-$USER/$RUN
 export BASTION_TIER=disabled
 # export LIBTPU_LOGS=$TRAINER_DIR
-export LIBTPU_LOGS=$PROJECT_ID-axlearn-$USER
-# export LIBTPU_INIT_ARGS="--megascale_rapideye_error_digest_log_path=${LIBTPU_LOGS} --megascale_debug_port=8081"
+export LIBTPU_LOGS=$TRAINER_DIR
 
 # export UPLOAD_INTERVAL=5
 # Ensure USER is set for the job name (e.g., isaack)
