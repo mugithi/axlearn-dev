@@ -159,9 +159,9 @@ def default_xla_options(
             xla_tpu_enable_sunk_dcn_allreduce_done_with_host_reduction="true",
             # Aborting the coordinator after collecting errors from all workers.
             # All workers will also abort after they detect the coordinator is shutdown.
-            megascale_error_reporter_abort_on_hang="false",
+            megascale_error_reporter_abort_on_hang="true",
             # Similar to megascale_error_reporter_abort_on_hang but for unrecoverable errors.
-            megascale_error_reporter_abort_on_error="false",
+            megascale_error_reporter_abort_on_error="true",
             # Increase the timeout at which a hang is detected/reported, default is 5m.
             megascale_graph_hang_threshold="10m",
             # Similar to megascale_graph_hang_threshold but specific to within a launch_id.
