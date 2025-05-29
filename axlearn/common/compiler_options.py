@@ -53,7 +53,8 @@ def default_xla_options(
     if libtpu_logs_path and libtpu_logs_path.startswith("gs://"):
         print(f"DEBUG_COMPILER_OPTIONS.PY: LIBTPU_LOGS is gs:// path '{libtpu_logs_path}'. Adding megascale flags.", file=sys.stderr)
         options.update(
-            megascale_rapideye_error_digest_log_path=libtpu_logs_path,
+            # megascale_rapideye_error_digest_log_path=libtpu_logs_path,
+            megascale_rapideye_error_digest_log_path="/output/isaack/rapideye_error_digest/",
             megascale_debug_port=8081,
             # megascale_graph_executor_include_telemetry_in_state_summary="false",
 
@@ -158,9 +159,9 @@ def default_xla_options(
             xla_tpu_enable_sunk_dcn_allreduce_done_with_host_reduction="true",
             # Aborting the coordinator after collecting errors from all workers.
             # All workers will also abort after they detect the coordinator is shutdown.
-            megascale_error_reporter_abort_on_hang="true",
+            megascale_error_reporter_abort_on_hang="false",
             # Similar to megascale_error_reporter_abort_on_hang but for unrecoverable errors.
-            megascale_error_reporter_abort_on_error="true",
+            megascale_error_reporter_abort_on_error="false",
             # Increase the timeout at which a hang is detected/reported, default is 5m.
             megascale_graph_hang_threshold="10m",
             # Similar to megascale_graph_hang_threshold but specific to within a launch_id.
