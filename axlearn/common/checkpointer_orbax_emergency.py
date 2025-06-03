@@ -575,12 +575,16 @@ class OrbaxEmergencyCheckpointer(BaseCheckpointer):
             replica_axis_index: The index of the "data" axis.
         """
 
+        # Default save_policy for GCS (persistent checkpoints).
+        save_policy: InstantiableConfig[CheckpointPolicy] = config_for_function(
+            every_n_steps_policy
+        ).set(n=25)
         keep_last_n: int = 1
         keep_every_n_steps: Optional[int] = None
         local_keep_last_n: int = 1
         local_save_policy: InstantiableConfig[CheckpointPolicy] = config_for_function(
             every_n_steps_policy
-        ).set(n=10)
+        ).set(n=10) # Changed from n=10
         local_dir: str = "/host-tmp/checkpoints"
         trainer_dir: Required[str] = REQUIRED
         non_tensor_async_timeout_secs: int = 300
@@ -654,9 +658,14 @@ class OrbaxEmergencyCheckpointer(BaseCheckpointer):
         # Non-tensor states must save when either local or persistent ckpt needs to be saved for
         # restore from either to succeed.
         def _composite_save_policy(*, step: int, evaler_summaries: dict[str, Any]):
+            # Directly use the instantiated policies from OrbaxEmergencyCheckpointer.Config
+            # instead of re-instantiating them here from cfg.save_policy.
+            # This ensures our default changes take effect if not overridden elsewhere.
+            active_save_policy = self.config.save_policy.instantiate()
+            active_local_save_policy = self.config.local_save_policy.instantiate()
             return (
-                save_policy(step=step, evaler_summaries=evaler_summaries)
-                or local_save_policy(step=step, evaler_summaries=evaler_summaries)
+                active_save_policy(step=step, evaler_summaries=evaler_summaries)
+                or active_local_save_policy(step=step, evaler_summaries=evaler_summaries)
                 or self._reached_preemption
             )
 
@@ -705,6 +714,10 @@ class OrbaxEmergencyCheckpointer(BaseCheckpointer):
 
         # For meaning of these options, refer to
         # https://github.com/google/orbax/blob/95be2c021bc8cbf4badd83a053ff57b7a9f9b314/checkpoint/orbax/checkpoint/experimental/emergency/checkpoint_manager.py#L277
+        # Use the policies from self.config directly to ensure defaults are picked up.
+        active_save_policy = self.config.save_policy.instantiate()
+        active_local_save_policy = self.config.local_save_policy.instantiate()
+
         self._tensor_manager = oecp.CheckpointManager(
             self._local_dir,
             persistent_directory=os.path.join(cfg.dir, self._TENSORS_PREFIX),
@@ -713,13 +726,13 @@ class OrbaxEmergencyCheckpointer(BaseCheckpointer):
             options=oecp.CheckpointManagerOptions(
                 local=oecp.LocalCheckpointOptions(
                     should_save_fn=functools.partial(
-                        _orbax_save_fn, wrapped_save_policy=local_save_policy
+                        _orbax_save_fn, wrapped_save_policy=active_local_save_policy
                     ),
                     max_to_keep=cfg.local_keep_last_n,
                 ),
                 persistent=oecp.PersistentCheckpointOptions(
                     should_save_fn=functools.partial(
-                        _orbax_save_fn, wrapped_save_policy=save_policy
+                        _orbax_save_fn, wrapped_save_policy=active_save_policy
                     ),
                     max_to_keep=cfg.keep_last_n,
                 ),
