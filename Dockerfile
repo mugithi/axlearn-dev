@@ -93,7 +93,7 @@ RUN pip install .[core,tpu]
 
 # Force reinstall our desired libtpu version after .[core,tpu] has run.
 # This will fetch and reinstall libtpu==0.0.11.2 even if other versions were pulled by dependencies.
-RUN pip install --no-cache-dir --force-reinstall libtpu==0.0.11.3 --extra-index-url https://storage.googleapis.com/libtpu-wheels/
+RUN pip install --no-cache-dir --force-reinstall libtpu==0.0.11.4
 RUN if [ -n "$EXTRAS" ]; then pip install .[$EXTRAS]; fi
 COPY . .
 
