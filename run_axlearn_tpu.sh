@@ -33,21 +33,17 @@ axlearn gcp launch start --cluster=$CLUSTER \
         --bundler_spec=allow_dirty=True \
         --bundler_type=artifactregistry --bundler_spec=image=tpu \
         --bundler_spec=dockerfile=Dockerfile --bundler_spec=target=tpu \
-        --host_mount_spec=name=tmp,host_path=/tmp,mount_path=/host-tmp \
-        -- python3 -m axlearn.common.launch_trainer_main \
-          --module=text.gpt.c4_trainer --config=fuji-7B-v2-flash \
+        -- env LIBTPU_LOGS="$LIBTPU_LOGS" python3 -m axlearn.common.launch_trainer_main \
+        --module=text.gpt.c4_trainer --config=fuji-7B-v2-flash \
           --trainer_dir=$TRAINER_DIR \
           --data_dir=gs://axlearn-public/tensorflow_datasets \
           --jax_backend=tpu \
           --mesh_selector=tpu-v6e-16 \
           --trace_at_steps=3 \
-          --host_mount_spec=name=tmp,host_path=/tmp,mount_path=/host-tmp \
-          --init_module=axlearn.common.checkpointer_orbax_emergency:local_ckpt_dir=/host-tmp/checkpoints
-
-#           # --recorder_type=axlearn.cloud.gcp.measurement:goodput \
-#           # --recorder_spec=name=goodput_$RUN \
-#           # --recorder_spec=upload_dir=$OUTPUT_DIR/$RUN/summaries \
-#           # --recorder_spec=upload_interval=$UPLOAD_INTERVAL
+          # --recorder_type=axlearn.cloud.gcp.measurement:goodput \
+          # --recorder_spec=name=goodput_$RUN \
+          # --recorder_spec=upload_dir=$OUTPUT_DIR/$RUN/summaries \
+          # --recorder_spec=upload_interval=$UPLOAD_INTERVAL
 
 axlearn gcp launch run --cluster=$CLUSTER \
         --runner_name gke_tpu_single \
@@ -57,15 +53,10 @@ axlearn gcp launch run --cluster=$CLUSTER \
         --bundler_spec=allow_dirty=True \
         --bundler_type=artifactregistry --bundler_spec=image=tpu \
         --bundler_spec=dockerfile=Dockerfile --bundler_spec=target=tpu \
-        --host_mount_spec=name=tmp,host_path=/tmp,mount_path=/host-tmp \
-        -- python3 -m axlearn.common.launch_trainer_main \
-          --module=text.gpt.c4_trainer --config=fuji-7B-v2-flash \
+        -- env LIBTPU_LOGS="$LIBTPU_LOGS" python3 -m axlearn.common.launch_trainer_main \
+        --module=text.gpt.c4_trainer --config=fuji-7B-v2-flash \
           --trainer_dir=$TRAINER_DIR \
           --data_dir=gs://axlearn-public/tensorflow_datasets \
           --jax_backend=tpu \
           --mesh_selector=tpu-v6e-16 \
           --trace_at_steps=3 \
-          --host_mount_spec=name=tmp,host_path=/tmp,mount_path=/host-tmp \
-          --init_module=axlearn.common.checkpointer_orbax_emergency:local_ckpt_dir=/host-tmp/checkpoints
-
-        # -- env LIBTPU_LOGS="$LIBTPU_LOGS" python3 -m axlearn.common.launch_trainer_main \
