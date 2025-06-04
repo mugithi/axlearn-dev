@@ -49,12 +49,10 @@ def default_xla_options(
     # Check for LIBTPU_LOGS and add megascale debug flags if applicable.
     libtpu_logs_path = os.environ.get("LIBTPU_LOGS")
     # More forceful temporary debug print:
-    print(f"DEBUG_COMPILER_OPTIONS.PY: LIBTPU_LOGS in default_xla_options: {libtpu_logs_path}", file=sys.stderr)
     if libtpu_logs_path and libtpu_logs_path.startswith("gs://"):
         print(f"DEBUG_COMPILER_OPTIONS.PY: LIBTPU_LOGS is gs:// path '{libtpu_logs_path}'. Adding megascale flags.", file=sys.stderr)
         options.update(
-            # megascale_rapideye_error_digest_log_path=libtpu_logs_path,
-            megascale_rapideye_error_digest_log_path="/output/isaack/rapideye_error_digest/",
+            megascale_rapideye_error_digest_log_path=libtpu_logs_path,
             megascale_debug_port=8081,
             # megascale_graph_executor_include_telemetry_in_state_summary="false",
 
