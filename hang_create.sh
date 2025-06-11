@@ -20,7 +20,8 @@ GRPCURL_VERSION="1.8.6"
 POD_GRPC_PORT="8081" # Port on the pod where the gRPC service is listening
 GRPC_SERVICE="xla.megascale.runtime.MegascaleDebugService"
 # Payload for SetImpairments - ensure quotes are handled correctly for shell
-SET_IMPAIRMENTS_PAYLOAD='{ "communication_impairments": { "delay_profile": { "points": { "percentile": 50, "drop": true } } } }'
+#SET_IMPAIRMENTS_PAYLOAD='{ "communication_impairments": { "delay_profile": { "points": { "percentile": 50, "drop": true } } } }'
+SET_IMPAIRMENTS_PAYLOAD='{ "communication_impairments": { "d2h_impairment": {"drop_all": true}}}'
 
 # --- Script ---
 
@@ -71,23 +72,23 @@ else
 fi
 # --- End Get GKE Cluster Credentials ---
 
-# Construct the name of the first Kubernetes Job created by the JobSet
+# Construct the name of the Kubernetes Job (0-indexed)
 # Convention: jobsetname-replicatedjobname-0
-FIRST_K8S_JOB_NAME="${TARGET_JOBSET_NAME}-${REPLICATED_JOB_NAME_IN_JOBSET}-0"
-echo "Identifying first pod of Kubernetes Job: $FIRST_K8S_JOB_NAME"
+TARGET_K8S_JOB_NAME="${TARGET_JOBSET_NAME}-${REPLICATED_JOB_NAME_IN_JOBSET}-0"
+echo "Identifying second pod of Kubernetes Job: $TARGET_K8S_JOB_NAME"
 
-# Fetch the name of the first pod for this specific Kubernetes Job
+# Fetch the name of the second pod for this specific Kubernetes Job
 # Pods created by a Job have a 'job-name' label matching the K8s Job name.
-# We sort by name to get a consistent "first" pod, typically the one with index 0.
-TARGET_POD_NAME=$(kubectl get pods -l job-name="$FIRST_K8S_JOB_NAME" --sort-by=.metadata.name --no-headers=true -o=custom-columns=NAME:.metadata.name | head -n 1)
+# We sort by name and then select the second pod (e.g., the one with index 1 like '...-0-1-...').
+TARGET_POD_NAME=$(kubectl get pods -l job-name="$TARGET_K8S_JOB_NAME" --sort-by=.metadata.name --no-headers=true -o=custom-columns=NAME:.metadata.name | sed -n '2p')
 
 if [ -z "$TARGET_POD_NAME" ]; then
-  echo "ERROR: No pods found for Kubernetes Job '$FIRST_K8S_JOB_NAME'. This job might not have started or might have already completed/failed."
-  echo "Please check the status of JobSet '$TARGET_JOBSET_NAME' and its jobs."
+  echo "ERROR: No second pod found for Kubernetes Job '$TARGET_K8S_JOB_NAME'. This job might not have started, might have already completed/failed, or might not have a second pod."
+  echo "Please check the status of JobSet '$TARGET_JOBSET_NAME' and its jobs, and ensure at least two pods exist for Job '$TARGET_K8S_JOB_NAME'."
   exit 1
 fi
 
-echo "Targeting specific pod: $TARGET_POD_NAME (from K8s Job $FIRST_K8S_JOB_NAME)"
+echo "Targeting specific pod: $TARGET_POD_NAME (from K8s Job $TARGET_K8S_JOB_NAME)"
 
 # Define a fixed local port for the single target pod
 TARGET_LOCAL_PORT=10000
