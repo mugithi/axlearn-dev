@@ -16,11 +16,11 @@ REPLICATED_JOB_NAME_IN_JOBSET="job"         # The 'Name' of the ReplicatedJob wi
 # The script will find the first pod of the K8s job: ${TARGET_JOBSET_NAME}-${REPLICATED_JOB_NAME_IN_JOBSET}-0
 
 # gRPC Call Details
-GRPCURL_VERSION="1.8.6"
+GRPCURL_VERSION="1.9.1"
 POD_GRPC_PORT="8081" # Port on the pod where the gRPC service is listening
 GRPC_SERVICE="xla.megascale.runtime.MegascaleDebugService"
 # Payload for SetImpairments - ensure quotes are handled correctly for shell
-#SET_IMPAIRMENTS_PAYLOAD='{ "communication_impairments": { "delay_profile": { "points": { "percentile": 50, "drop": true } } } }'
+# SET_IMPAIRMENTS_PAYLOAD='{ "communication_impairments": { "delay_profile": { "points": { "percentile": 50, "drop": true } } } }'
 SET_IMPAIRMENTS_PAYLOAD='{ "communication_impairments": { "d2h_impairment": {"drop_all": true}}}'
 
 # --- Script ---
