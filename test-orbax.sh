@@ -123,7 +123,7 @@ else
   GCSFUSE_MOUNT_SPEC=""
 fi
 
-axlearn gcp launch start --cluster=$GKE_CLUSTER \
+axlearn gcp launch run --cluster=$GKE_CLUSTER \
       --runner_name gke_tpu_single \
       --name=$JOBSET_NAME \
       --instance_type=${INSTANCE_TYPE} \

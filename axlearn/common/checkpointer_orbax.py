@@ -193,6 +193,7 @@ class OrbaxCheckpointer(BaseCheckpointer):
             keep_every_n_steps: If set, keep a checkpoint every n steps.
             validation_type: Checkpoint validation during restore.
             async_timeout_secs: Timeout for async barrier in seconds.
+            use_replica_parallel: Whether to use replica parallel checkpointing.
         """
 
         keep_last_n: int = 1
@@ -202,6 +203,7 @@ class OrbaxCheckpointer(BaseCheckpointer):
         max_concurrent_save_gb: Optional[int] = None
         max_concurrent_restore_gb: Optional[int] = None
         enable_single_replica_ckpt_restoring: bool = True
+        use_replica_parallel: bool = True
 
     @classmethod
     def checkpoint_paths(cls, base_dir: str) -> List[str]:
@@ -261,6 +263,7 @@ class OrbaxCheckpointer(BaseCheckpointer):
                 "state": ocp.PyTreeCheckpointHandler(
                     save_concurrent_gb=cfg.max_concurrent_save_gb,
                     restore_concurrent_gb=cfg.max_concurrent_restore_gb,
+                    use_replica_parallel=cfg.use_replica_parallel,
                 ),
             },
         )
