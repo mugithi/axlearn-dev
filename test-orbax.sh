@@ -40,7 +40,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 export NUM_REPLICAS=${NUM_REPLICAS:-2}
-export JOBSET_NAME="isaack"
+export JOBSET_NAME="isaack-1"
 export BASTION_TIER=disabled
 export GKE_CLUSTER="isaack-axlearn"
 export INSTANCE_TYPE="tpu-v6e-16"

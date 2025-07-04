@@ -263,7 +263,6 @@ class OrbaxCheckpointer(BaseCheckpointer):
                 "state": ocp.PyTreeCheckpointHandler(
                     save_concurrent_gb=cfg.max_concurrent_save_gb,
                     restore_concurrent_gb=cfg.max_concurrent_restore_gb,
-                    use_replica_parallel=cfg.use_replica_parallel,
                 ),
             },
         )
@@ -296,9 +295,22 @@ class OrbaxCheckpointer(BaseCheckpointer):
 
         Checkpoint saving is handled by `orbax` checkpoint manager.
         """
+        cfg: OrbaxCheckpointer.Config = self.config
         spec = self._get_spec(step=step, state=state)
         assert self._eval_summaries is None, self._eval_summaries
         self._eval_summaries = copy.deepcopy(evaler_summaries or {})
+
+        # Store the original handler to restore it later
+        original_handler = None
+        if not cfg.use_replica_parallel:
+            # Get the current handler for jax.Array
+            original_handler = ocp.type_handlers.get_type_handler(jax.Array)
+            # Register a new ArrayHandler with use_replica_parallel=False
+            custom_handler = ArrayHandler(
+                use_replica_parallel=False,
+                array_metadata_store=array_metadata_store_lib.Store(),
+            )
+            ocp.type_handlers.register_type_handler(jax.Array, custom_handler, override=True)
 
         try:
             # Note that save() waits for prior serialization to finish.
@@ -321,6 +333,9 @@ class OrbaxCheckpointer(BaseCheckpointer):
                 self._manager.wait_until_finished()
                 raise SystemExit(f"Exiting after saving checkpoint at {step=} due to pre-emption.")
         finally:
+            # Restore the original handler if we modified it
+            if not cfg.use_replica_parallel and original_handler is not None:
+                ocp.type_handlers.register_type_handler(jax.Array, original_handler, override=True)
             self._eval_summaries = None
 
     def restore(
