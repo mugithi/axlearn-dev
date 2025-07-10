@@ -46,7 +46,6 @@ export GKE_CLUSTER="isaack-axlearn"
 export INSTANCE_TYPE="tpu-v6e-16"
 export MESH_SELECTOR=${MESH:-"tpu-v6e-16"}
 export CONFIG=${CONFIG:-"fuji-7B-v2-flash-orbax"}
-### KeyError: 'Unrecognized config fuji-70B-v2-flash-orbax; did you mean [fuji-70B-v2-flash-orbaxem, fuji-70B-v1-flash-orbaxem, fuji-70B-v3-flash-orbaxem, fuji-70B-v3-tiktoken-flash-orbaxem, fuji-7B-v2-flash-orbaxem, fuji-7B-v2-flash-orbaxem-single-host, fuji-test-v2-flash-orbaxem, fuji-70B-v2-flash, fuji-7B-v1-flash-orbaxem, fuji-7B-v1-flash-orbaxem-single-host, fuji-7B-v3-flash-orbaxem, fuji-7B-v3-flash-orbaxem-single-host, fuji-1B-v3-flash-orbaxem, fuji-1B-v3-flash-orbaxem-single-host, fuji-1B-v3-tiktoken-flash-orbaxem, fuji-1B-v3-tiktoken-flash-orbaxem-single-host, fuji-3B-v3-flash-orbaxem, fuji-3B-v3-flash-orbaxem-single-host, fuji-3B-v3-tiktoken-flash-orbaxem, fuji-3B-v3-tiktoken-flash-orbaxem-single-host, fuji-70B-v2-orbaxem, fuji-8B-v3-tiktoken-flash-orbaxem, fuji-8B-v3-tiktoken-flash-orbaxem-single-host, fuji-7B-v2-flash-single-host, fuji-test-v1-flash-orbaxem, fuji-test-v3-flash-orbaxem, fuji-test-v3-tiktoken-flash-orbaxem, fuji-70B-v1-flash, fuji-70B-v1-orbaxem, fuji-70B-v3-flash, fuji-70B-v3-orbaxem, fuji-70B-v3-tiktoken-flash, fuji-70B-v3-tiktoken-orbaxem, fuji-7B-v2-flash, fuji-7B-v2-orbaxem, fuji-7B-v2-orbaxem-single-host]'
 export PROJECT_ID="tpu-prod-env-one-vm"
 export REGION="us-east5"
 export TRAINER_DIR_FINAL="gs://tpu-prod-env-one-vm-axlearn-isaack"
@@ -79,7 +78,7 @@ fi
 
 if [ "$CHECKPOINTER" == "emergency" ]; then
   echo "Running with Orbax emergency checkpointer."
-  CMD="python3 -c 'import jax; jax.devices()'; python3 -m axlearn.common.launch_trainer_main"
+  CMD="ulimit -n 1048576; ulimit -c 0; python3 -c 'import jax; jax.devices()'; python3 -m axlearn.common.launch_trainer_main"
   CMD_ARGS="--init_module=axlearn.common.checkpointer_orbax_emergency:local_ckpt_dir=/host-tmp/checkpoints \
          --config_module=text.gpt.c4_trainer \
          --config=${CONFIG} \
