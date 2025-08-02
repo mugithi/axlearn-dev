@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -xe
-
+USER=isaackkaranja@google.com
 # Default values
 CHECKPOINTER="regular"
 ENABLE_GCSFUSE=false
@@ -79,7 +79,8 @@ fi
 if [ "$CHECKPOINTER" == "emergency" ]; then
   echo "Running with Orbax emergency checkpointer."
   CMD="ulimit -n 1048576; ulimit -c 0; python3 -c 'import jax; jax.devices()'; python3 -m axlearn.common.launch_trainer_main"
-  CMD_ARGS="--init_module=axlearn.common.checkpointer_orbax_emergency:local_ckpt_dir=/host-tmp/checkpoints \
+  CMD_ARGS="--v=1 \
+         --init_module=axlearn.common.checkpointer_orbax_emergency:local_ckpt_dir=/host-tmp/checkpoints \
          --config_module=text.gpt.c4_trainer \
          --config=${CONFIG} \
          --trainer_dir=${TRAINER_DIR_FINAL} \
@@ -92,7 +93,8 @@ if [ "$CHECKPOINTER" == "emergency" ]; then
 else
   echo "Running Orbax regular checkpointer or AXLearn native."
   CMD="ulimit -n 1048576; ulimit -c 0; python3 -c 'import jax; jax.devices()'; python3 -m axlearn.common.launch_trainer_main"
-  CMD_ARGS="--config_module=text.gpt.c4_trainer \
+  CMD_ARGS="--v=1 \
+          --config_module=text.gpt.c4_trainer \
           --config=${CONFIG} \
           --trainer_dir=${TRAINER_DIR_FINAL} \
           --data_dir=${DATA_DIR_FINAL}  \
